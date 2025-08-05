@@ -57,3 +57,6 @@ coverage/
 *.swp
 *.~
 notes.txt
+
+# Ignore OK tool files (hidden files starting with .ok_)
+**/.ok_*
