@@ -60,3 +60,6 @@ notes.txt
 
 # Ignore OK tool files (hidden files starting with .ok_)
 **/.ok_*
+
+# Ignore test files
+**/tests/
