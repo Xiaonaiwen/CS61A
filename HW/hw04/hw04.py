@@ -13,7 +13,14 @@ def shuffle(s):
     """
     assert len(s) % 2 == 0, 'len(seq) must be even'
     "*** YOUR CODE HERE ***"
-
+    mid = len(s) // 2
+    s1 = s[:mid]
+    s2 = s[mid:]
+    newList = []
+    for i in range(mid):
+        newList.append(s1[i])
+        newList.append(s2[i])
+    return newList
 
 def deep_map(f, s):
     """Replace all non-list elements x with f(x) in the nested list s.
@@ -38,7 +45,12 @@ def deep_map(f, s):
     True
     """
     "*** YOUR CODE HERE ***"
-
+    for i in range(len(s)):
+        if type(s[i]) == list:
+            deep_map(f,s[i])
+        else:
+            s[i] = f(s[i])
+            
 
 HW_SOURCE_FILE=__file__
 
@@ -47,11 +59,14 @@ def planet(mass):
     """Construct a planet of some mass."""
     assert mass > 0
     "*** YOUR CODE HERE ***"
+    list = ['planet', mass]
+    return list
 
 def mass(p):
     """Select the mass of a planet."""
     assert is_planet(p), 'must call mass on a planet'
     "*** YOUR CODE HERE ***"
+    return p[1]
 
 def is_planet(p):
     """Whether p is a planet."""
@@ -104,7 +119,14 @@ def balanced(m):
     True
     """
     "*** YOUR CODE HERE ***"
+    if is_planet(m):
+        return True
+    else:
+        assert is_mobile(m)
+        return total_mass(end(left(m))) * length(left(m)) == total_mass(end(right(m))) * length(right(m)) and balanced(end(left(m))) and balanced(end(right(m)))
+        
 
+    
 
 def berry_finder(t):
     """Returns True if t contains a node with the value 'berry' and 
@@ -124,7 +146,14 @@ def berry_finder(t):
     True
     """
     "*** YOUR CODE HERE ***"
-
+    if label(t) == 'berry':
+        return True
+    else:
+        bran = branches(t)
+        for i in range(len(bran)):
+            if berry_finder(bran[i]):
+                return True
+        return False
 
 HW_SOURCE_FILE=__file__
 
@@ -139,6 +168,16 @@ def max_path_sum(t):
     17
     """
     "*** YOUR CODE HERE ***"
+    if is_leaf(t):
+        return label(t)
+    else:
+        bran = branches(t)
+        max = -1
+        for i in range(len(bran)):
+            temp = max_path_sum(bran[i]) 
+            if temp > max:
+                max = temp
+        return max + label(t)
 
 
 def mobile(left, right):
