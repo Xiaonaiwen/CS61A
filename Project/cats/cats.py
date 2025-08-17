@@ -172,7 +172,7 @@ def memo_diff(diff_function):
             return result
         else:
             tupleTemp = cache[typ_sour_tuple]
-            if tupleTemp[1] <= limit and tupleTemp[0] < tupleTemp[1]:
+            if tupleTemp[1] >= limit:
                 return cache[typ_sour_tuple][0]
             else:
                 result = diff_function(typed, source, limit)
