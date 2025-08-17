@@ -100,6 +100,7 @@ class Ant(Insect):
     implemented = False  # Only implemented Ant classes should be instantiated
     food_cost = 0
     is_container = False
+    blocks_path = True
     # ADD CLASS ATTRIBUTES HERE
 
     def __init__(self, health=1):
@@ -494,16 +495,17 @@ class SlowThrower(ThrowerAnt):
         # BEGIN Problem EC 1
         "*** YOUR CODE HERE ***"
         if target is not None:
-            target.remaining = self.turns
-            original_action = target.action
+            target.remaining = SlowThrower.turns
+            if not hasattr(target,'original_action'):
+                target.original_action = target.action
             def new_action(gamestate):
                 if target.remaining == 0:
-                    print(1)
-                    target.action = original_action
+                    # print(1)
+                    target.action = target.original_action
                     target.action(gamestate)
                 else:
                     if gamestate.time % 2  == 0:
-                        original_action(gamestate)
+                        target.original_action(gamestate)
                     target.remaining -= 1
             target.action = new_action
         # END Problem EC 1
@@ -533,14 +535,19 @@ class NinjaAnt(Ant):
     name = 'Ninja'
     damage = 1
     food_cost = 5
+    blocks_path = False
     # OVERRIDE CLASS ATTRIBUTES HERE
     # BEGIN Problem EC 3
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
     # END Problem EC 3
 
     def action(self, gamestate):
         # BEGIN Problem EC 3
         "*** YOUR CODE HERE ***"
+        bee_list = self.place.bees
+        replicate_list = bee_list[:]
+        for bee in replicate_list:
+            bee.reduce_health(self.damage)
         # END Problem EC 3
 
 
@@ -549,9 +556,10 @@ class LaserAnt(ThrowerAnt):
 
     name = 'Laser'
     food_cost = 10
+    base_damage = 2
     # OVERRIDE CLASS ATTRIBUTES HERE
     # BEGIN Problem EC 4
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
     # END Problem EC 4
 
     def __init__(self, health=1):
@@ -560,12 +568,39 @@ class LaserAnt(ThrowerAnt):
 
     def insects_in_front(self):
         # BEGIN Problem EC 4
-        return {}
+        distance = 0
+        dictionary = {}
+        position = self.place
+        
+        if position.ant != self:
+            dictionary[position.ant] = distance
+        if position.bees:
+            for bee in position.bees:
+                dictionary[bee] = distance 
+        position = position.entrance
+        distance += 1
+        while not position.is_hive:
+            if position.ant:
+                if position.ant.is_container:
+                    if position.ant.ant_contained:
+                        dictionary[position.ant.ant_contained] = distance
+                dictionary[position.ant] = distance
+            
+            if position.bees:
+                for bee in position.bees:
+                    dictionary[bee] = distance
+            
+            position = position.entrance
+            distance  += 1
+        return dictionary
         # END Problem EC 4
 
     def calculate_damage(self, distance):
         # BEGIN Problem EC 4
-        return 0
+        damage = self.base_damage - self.insects_shot * 0.0625 - 0.25 * distance
+        if damage <= 0:
+            return 0
+        return damage 
         # END Problem EC 4
 
     def action(self, gamestate):
@@ -604,7 +639,7 @@ class Bee(Insect):
         """Return True if this Bee cannot advance to the next Place."""
         # Special handling for NinjaAnt
         # BEGIN Problem EC 3
-        return self.place.ant is not None
+        return self.place.ant is not None and self.place.ant.blocks_path
         # END Problem EC 3
 
     def action(self, gamestate):
