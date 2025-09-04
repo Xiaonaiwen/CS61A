@@ -28,6 +28,8 @@ def scheme_eval(expr, env, _=None): # Optional third argument is ignored
     # All non-atomic expressions are lists (combinations)
     if not scheme_listp(expr):
         raise SchemeError('malformed list: {0}'.format(repl_str(expr)))
+
+    
     first, rest = expr.first, expr.rest
     if scheme_symbolp(first) and first in scheme_forms.SPECIAL_FORMS:
         return scheme_forms.SPECIAL_FORMS[first](rest, env)
@@ -134,13 +136,9 @@ def optimize_tail_calls(unoptimized_scheme_eval):
         if tail and not scheme_symbolp(expr) and not self_evaluating(expr):
             return Unevaluated(expr, env)
 
+        result = Unevaluated(expr, env)
         # BEGIN OPTIONAL PROBLEM 1
         "*** YOUR CODE HERE ***"
-        result = unoptimized_scheme_eval(expr, env)
-
-        while isinstance(result, Unevaluated):
-            result = unoptimized_scheme_eval(result.expr, env)
-        return result
         # END OPTIONAL PROBLEM 1
     return optimized_eval
 
